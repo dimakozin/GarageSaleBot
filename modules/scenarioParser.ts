@@ -20,20 +20,21 @@ class ScenarioParser {
         return this.scenario.states[state].endpoints
     }
 
+    private getEndpointByEndpointName(endpoints, endpoint) {
+        if(endpoint in endpoints){
+            return endpoints[endpoint]
+        } else if('default' in endpoints) {
+            return endpoint['default']
+        } else {
+            return null
+        }
+    }
+
     public getResponse(state: string, endpoint: string) {
         const endpoints = this.getEndpointsByStates(state)
-        /*
-        TODO: parse endpoint
-
+        const endpointData = this.getEndpointByEndpointName(endpoints, endpoint)
         
-        let responseParameters = null
-        if(endpoint in endpoints){
-            responseParameters = endpoints[endpoint]
-        } else {
-            responseParameters = endpoint['default']
-        }
-        */
-
+        console.log(endpointData)
     }
 
 }

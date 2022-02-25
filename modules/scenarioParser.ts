@@ -86,7 +86,7 @@ class ScenarioParser {
             return options
 
         }
-        else return null
+        else return {}
     }
 
     public getResponse(state: string, endpoint: string) {

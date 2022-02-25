@@ -43,7 +43,7 @@ class ScenarioParser {
             if('ReplyKeyboardMarkup' in endpointData.reply_markup){
                 options.reply_markup = {} as IReplyKeyboardMarkup
 
-                options.reply_markup.one_time_keyboard = true // TODO: get from scenarion
+                options.reply_markup.one_time_keyboard = false // TODO: get from scenarion
                 options.reply_markup.resize_keyboard = true // TODO: get from scenario
                 options.reply_markup.keyboard = []
                 

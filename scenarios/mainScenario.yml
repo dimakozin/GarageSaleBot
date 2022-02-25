@@ -16,12 +16,7 @@ states:
                 - button:
                     text: "/help"
                 - button: 
-                    text: "/help"
-              - row:
-                - button:
-                    text: "/help"
-                - button:
-                    text: "/help"
+                    text: "/getCatalog"
 
       /help:
         text:
@@ -38,8 +33,6 @@ states:
         drop_state: True
 
       /getCatalog:
-        text:
-        - "Выберите интересующую вас категорию:"
         postActions:
           - "sendCategories"
 

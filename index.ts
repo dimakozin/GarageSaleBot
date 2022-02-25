@@ -1,6 +1,4 @@
 import TelegramBot from 'node-telegram-bot-api';
-import YAML from 'js-yaml'
-import fs from 'fs'
 
 import StateMachine from './modules/stateMachine'
 import { ScenarioParser  } from './modules/scenarioParser'

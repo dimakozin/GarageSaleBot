@@ -37,23 +37,11 @@ states:
                     text: "/getCatalog"
         drop_state: True
 
-      /test:
+      /getCatalog:
         text:
-        - "🤖 InlineKeyboard Test"
-        reply_markup:
-          InlineKeyboardMarkup:
-            inline_keyboard:
-              - row:
-                - button:
-                    text: "Текст с URL в первой строке"
-                    url: "https://t.me/dimakozin_bot"
-              - row:
-                - button:
-                    text: "Текст с URL во второй строке"
-                    url: "https://t.me/dimakozin_bot"
-                - button:
-                    text: "Текст с callback-data во второй строке"
-                    callback_data: "Some text"
+        - "Выберите интересующую вас категорию:"
+        postActions:
+          - "sendCategories"
 
       default:
         text:
@@ -65,12 +53,5 @@ states:
               - row:
                   - button:
                       text: "/help"
-        drop_state: True
-
-  getCatalog:
-    endpoints:
-      defailt:
-        text:
-        - 'Работаем над этим'
         drop_state: True
   

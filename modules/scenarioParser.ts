@@ -99,10 +99,14 @@ class ScenarioParser {
         const stateParameters = {
             dropState: endpointData.dropState,
             setState: 'setState' in endpointData ? endpointData.setState : null,
-            setStateName: 'setStateName' in endpointData ? endpointData.setStateName : null,
+            setStateName: 'setStateName' in endpointData ? endpointData.setStateName : null
         }
         
-        return {text, options, stateParameters}
+        const actions = {
+            postActions: 'postActions' in endpointData ? endpointData.postActions : null
+        }
+
+        return {text, options, stateParameters, actions}
     }
 
 }

@@ -103,7 +103,8 @@ class ScenarioParser {
         }
         
         const actions = {
-            postActions: 'postActions' in endpointData ? endpointData.postActions : null
+            middlewares: 'middlewares' in endpointData? endpointData.middlewares : null,
+            postActions: 'postActions' in endpointData ? endpointData.postActions : null,
         }
 
         return {text, options, stateParameters, actions}

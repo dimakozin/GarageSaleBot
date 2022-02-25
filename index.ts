@@ -11,6 +11,7 @@ const bot = new TelegramBot(token, {polling: true});
 const scenarioParser = new ScenarioParser(settings.scenarioFile)
 
 import Actions from './scenarios/actions'
+import Middlewares from './scenarios/middlwares'
 
 bot.on('message', (msg) => {
     const chatId = msg.chat.id
@@ -20,16 +21,29 @@ bot.on('message', (msg) => {
 
     const response = scenarioParser.getResponse(userState, text)
     
-    // TODO: middlewares
-    bot.sendMessage(chatId, response.text, response.options)
-
-    const postActions = response.actions.postActions
-    if(postActions){
-        postActions.forEach( action => {
-            if(action in Actions){
-                Actions[action](bot, msg);
-            }   
+    const middlewares = response.actions.middlewares
+    let middlewaresPassed = true
+    if(middlewares){
+        middlewares.forEach( middleware =>{
+            if(middlewaresPassed){
+                middlewaresPassed = Middlewares[middleware](bot, msg)
+            }
         })
+    }
+
+    if(middlewaresPassed){
+        bot.sendMessage(chatId, response.text, response.options)
+
+        const postActions = response.actions.postActions
+        if(postActions){
+            postActions.forEach( action => {
+                if(action in Actions){
+                    Actions[action](bot, msg);
+                }   
+            })
+        }
+    } else {
+        bot.sendMessage(chatId, 'Действие запрещено') 
     }
 
     if(response.stateParameters.dropState){

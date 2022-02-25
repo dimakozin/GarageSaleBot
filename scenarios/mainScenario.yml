@@ -12,8 +12,16 @@ states:
         reply_markup:
           ReplyKeyboardMarkup:
             keyboard:
-            - row:
-              text: "/help"
+              - row:
+                - button:
+                    text: "/help"
+                - button: 
+                    text: "/help"
+              - row:
+                - button:
+                    text: "/help"
+                - button:
+                    text: "/help"
 
       /help:
         text:
@@ -24,10 +32,29 @@ states:
         reply_markup:
           ReplyKeyboardMarkup:
             keyboard:
-            - row:
-              text: "/getCatalog"
+              - row:
+                - button:
+                    text: "/getCatalog"
         drop_state: True
-              
+
+      /test:
+        text:
+        - "🤖 InlineKeyboard Test"
+        reply_markup:
+          InlineKeyboardMarkup:
+            inline_keyboard:
+              - row:
+                - button:
+                    text: "Текст с URL в первой строке"
+                    url: "https://t.me/dimakozin_bot"
+              - row:
+                - button:
+                    text: "Текст с URL во второй строке"
+                    url: "https://t.me/dimakozin_bot"
+                - button:
+                    text: "Текст с callback-data во второй строке"
+                    callback_data: "Some text"
+
       default:
         text:
         - 'К сожалению, данная команда в боте не реализована 😔'
@@ -35,8 +62,9 @@ states:
         reply_markup:
           ReplyKeyboardMarkup:
             keyboard:
-            - row:
-              text: "/help"
+              - row:
+                  - button:
+                      text: "/help"
         drop_state: True
 
   getCatalog:

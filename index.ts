@@ -18,6 +18,12 @@ bot.on('message', (msg) => {
 
     const userState = StateMachine.getState(chatId)
 
-    scenarioParser.getResponse(userState, text)
-    
+    const response = scenarioParser.getResponse(userState, text)
+    bot.sendMessage(chatId, response.text, response.options)
+
+    if(response.stateParameters.dropState){
+        StateMachine.dropState(chatId)
+    } else if(response.stateParameters.setState){
+        StateMachine.setState(chatId, response.stateParameters.setStateName)
+    }
 })

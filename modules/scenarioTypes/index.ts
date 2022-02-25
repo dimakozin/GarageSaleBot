@@ -15,6 +15,12 @@ interface IKeyboardMarkup {
 
 }
 
+interface IButton {
+    text: string,
+    url?: string,
+    callback_data?: string
+}
+
 interface IReplyKeyboardMarkup extends IKeyboardMarkup {
     one_time_keyboard: Boolean,
     resize_keyboard: Boolean,
@@ -25,4 +31,10 @@ interface IInlineKeyboardMarkup extends IKeyboardMarkup {
     inline_keyboard: Array<object>,
 }
 
-export {IScenario, IBranch, IResponseOptions, IReplyKeyboardMarkup, IInlineKeyboardMarkup}
+export {IScenario, 
+    IBranch, 
+    IResponseOptions, 
+    IReplyKeyboardMarkup, 
+    IInlineKeyboardMarkup, 
+    IButton
+}

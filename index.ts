@@ -25,3 +25,5 @@ bot.on('message', (msg) => {
         StateMachine.setState(chatId, response.stateParameters.setStateName)
     }
 })
+
+bot.on("polling_error", console.log);

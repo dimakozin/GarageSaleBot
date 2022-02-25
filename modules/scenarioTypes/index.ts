@@ -7,4 +7,22 @@ interface IBranch {
     endpoints: Array<object>
 }
 
-export {IScenario, IBranch}
+interface IResponseOptions {
+    reply_markup: IReplyKeyboardMarkup|IInlineKeyboardMarkup
+}
+
+interface IKeyboardMarkup {
+
+}
+
+interface IReplyKeyboardMarkup extends IKeyboardMarkup {
+    one_time_keyboard: Boolean,
+    resize_keyboard: Boolean,
+    keyboard: Array<object>
+}
+
+interface IInlineKeyboardMarkup extends IKeyboardMarkup {
+    inline_keyboard: Array<object>,
+}
+
+export {IScenario, IBranch, IResponseOptions, IReplyKeyboardMarkup, IInlineKeyboardMarkup}

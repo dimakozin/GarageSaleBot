@@ -32,7 +32,9 @@ bot.on('message', (msg) => {
     }
 
     if(middlewaresPassed){
-        bot.sendMessage(chatId, response.text, response.options)
+        if(response.text){
+            bot.sendMessage(chatId, response.text, response.options)
+        }
 
         const postActions = response.actions.postActions
         if(postActions){
@@ -54,3 +56,7 @@ bot.on('message', (msg) => {
 })
 
 bot.on("polling_error", console.log);
+
+bot.on('callback_query', data => {
+    console.log(data)
+})

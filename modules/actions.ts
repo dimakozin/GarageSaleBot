@@ -13,7 +13,6 @@ import Storage from "./Storage"
 const categories_per_rows = 3
 
 export default {
-    // TODO: make action for first product in category
     sendCategories: (bot, msg, callback_data = null) => {
         let categories = Storage.getCategories()
 
@@ -35,9 +34,8 @@ export default {
                 buttonsRow.push({
                     text: button.name,
                     callback_data: JSON.stringify({
-                        action: 'getProdFromCategory',
+                        action: 'sendFirstFromCategory',
                         categoryId: button.id,
-                        seqNumber: 0
                     })
                 })
             })
@@ -128,5 +126,54 @@ export default {
                 }
             })
         })
-    } 
+    },
+    sendFirstFromCategory: (bot, msg, callback_data = null) => {
+        const {categoryId} = callback_data
+        const productInfo = Storage.getProdFromCategory(categoryId, 0);
+        const product = productInfo.product
+
+        let inline_keyboard = [[]]
+
+        const nextButton = {
+            text: '▶️',
+            callback_data: JSON.stringify({
+                action: 'getProdFromCategory',
+                categoryId: categoryId,
+                seqNumber: 1
+            })
+        }
+
+        const lastButton = {
+            text: '⏩',
+            callback_data: JSON.stringify({
+                action: 'getProdFromCategory',
+                categoryId: categoryId,
+                seqNumber: productInfo.categoryLength-1
+            })
+        }
+
+        const likeButton = {
+            text: '❤️',
+            callback_data: JSON.stringify({
+                action: 'likeProduct',
+                product: product.id
+            })
+        }
+
+        inline_keyboard[0].push(likeButton)
+
+        if(productInfo.categoryLength !== 1){
+            inline_keyboard[0].push(nextButton, lastButton)
+        }
+
+        const description = `${product.name}. Стоимость: ${product.price}`
+
+        bot.sendPhoto(msg.message.chat.id,
+            product.file_id, {
+                caption: description,
+                reply_markup: {
+                    inline_keyboard: inline_keyboard
+                }
+            })
+    }
 }

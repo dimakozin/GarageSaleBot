@@ -2,7 +2,8 @@
  *   IMPORTANT! 
  *   Every function must have arguments:
  *   @bot - instance of telegram bot
- *   @msg - user message
+ *   @msg - user message info
+ *   @callback_data (nullable) - callback dataobject 
  * 
  */
 
@@ -12,7 +13,8 @@ import Storage from "./Storage"
 const categories_per_rows = 3
 
 export default {
-    sendCategories: (bot, msg) => {
+    // TODO: make action for first product in category
+    sendCategories: (bot, msg, callback_data = null) => {
         let categories = Storage.getCategories()
 
         let rows = []
@@ -33,8 +35,9 @@ export default {
                 buttonsRow.push({
                     text: button.name,
                     callback_data: JSON.stringify({
-                        action: 'getProductsFromCategory',
-                        categoryId: button.id
+                        action: 'getProdFromCategory',
+                        categoryId: button.id,
+                        seqNumber: 0
                     })
                 })
             })
@@ -43,5 +46,87 @@ export default {
 
         bot.sendMessage(msg.chat.id, 'Выберите интересующую вас категорию:', options)
 
-    }
+    },
+    getProdFromCategory: (bot, msg, callback_data = null) => {
+        const {categoryId, seqNumber} = callback_data
+        const productInfo = Storage.getProdFromCategory(categoryId, seqNumber);
+        const product = productInfo.product
+
+        let inline_keyboard = [[]]
+
+        const firstButton = {
+            text: '⏪',
+            callback_data: JSON.stringify({
+                action: 'getProdFromCategory',
+                categoryId: categoryId,
+                seqNumber: 0
+            })
+        }
+
+        const prevButton = {
+            text: '◀️',
+            callback_data: JSON.stringify({
+                action: 'getProdFromCategory',
+                categoryId: categoryId,
+                seqNumber: seqNumber-1
+            })
+        }
+
+        const nextButton = {
+            text: '▶️',
+            callback_data: JSON.stringify({
+                action: 'getProdFromCategory',
+                categoryId: categoryId,
+                seqNumber: seqNumber + 1
+            })
+        }
+
+        const lastButton = {
+            text: '⏩',
+            callback_data: JSON.stringify({
+                action: 'getProdFromCategory',
+                categoryId: categoryId,
+                seqNumber: productInfo.categoryLength-1
+            })
+        }
+
+        const likeButton = {
+            text: '❤️',
+            callback_data: JSON.stringify({
+                action: 'likeProduct',
+                product: product.id
+            })
+        }
+
+        if(seqNumber > 0){
+            inline_keyboard[0].push(firstButton, prevButton)
+        } 
+
+        inline_keyboard[0].push(likeButton)
+
+        if(seqNumber < productInfo.categoryLength-1){
+            inline_keyboard[0].push(nextButton, lastButton)
+        }
+
+        const description = `${product.name}. Стоимость: ${product.price}`
+
+        bot.editMessageMedia({
+            type: 'photo',
+            media: product.file_id
+        }, {
+            chat_id: msg.message.chat.id,
+            message_id: msg.message.message_id,
+            reply_markup: {
+                inline_keyboard: inline_keyboard
+            },
+        }).then(() => {
+            bot.editMessageCaption(description, {
+                chat_id: msg.message.chat.id,
+                message_id: msg.message.message_id,
+                reply_markup: {
+                    inline_keyboard: inline_keyboard
+                }
+            })
+        })
+    } 
 }

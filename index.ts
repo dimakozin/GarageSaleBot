@@ -6,7 +6,7 @@ import ActionsParser from './modules/actionsParser'
 import * as settings from './settings.json' 
 
 import Actions from './modules/actions'
-import Middlewares from './scenarios/middlwares'
+import Middlewares from './scenarios/middlewares'
 
 const token = settings.token;
 const bot = new TelegramBot(token, {polling: true});

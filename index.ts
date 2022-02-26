@@ -1,17 +1,18 @@
 import TelegramBot from 'node-telegram-bot-api';
 
 import StateMachine from './modules/stateMachine'
-import { ScenarioParser  } from './modules/scenarioParser'
+import ScenarioParser from './modules/scenarioParser'
+import ActionsParser from './modules/actionsParser'
 import * as settings from './settings.json' 
 
+import Actions from './modules/actions'
+import Middlewares from './scenarios/middlewares'
 
 const token = settings.token;
 const bot = new TelegramBot(token, {polling: true});
 
 const scenarioParser = new ScenarioParser(settings.scenarioFile)
-
-import Actions from './scenarios/actions'
-import Middlewares from './scenarios/middlwares'
+const actionsParser = new ActionsParser(settings.actionsFile, bot)
 
 bot.on('message', (msg) => {
     const chatId = msg.chat.id
@@ -32,7 +33,9 @@ bot.on('message', (msg) => {
     }
 
     if(middlewaresPassed){
-        bot.sendMessage(chatId, response.text, response.options)
+        if(response.text){
+            bot.sendMessage(chatId, response.text, response.options)
+        }
 
         const postActions = response.actions.postActions
         if(postActions){
@@ -54,3 +57,7 @@ bot.on('message', (msg) => {
 })
 
 bot.on("polling_error", console.log);
+
+bot.on('callback_query', msg => {
+    actionsParser.doAction(msg)
+})

@@ -59,6 +59,5 @@ bot.on('message', (msg) => {
 bot.on("polling_error", console.log);
 
 bot.on('callback_query', msg => {
-    console.log(msg)
     actionsParser.doAction(msg)
 })

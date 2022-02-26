@@ -55,5 +55,16 @@ const products = [
 export default {
     getCategories: () => {
         return categories
+    },
+    getProdFromCategory: (categoryId: number, seqNumber: number) => {
+        const categoryProducts = products.filter(product => product.categoryId === categoryId)
+        if(seqNumber > categoryProducts.length){
+            return null
+        }
+        
+        return {
+            product: categoryProducts[seqNumber],
+            categoryLength: categoryProducts.length
+        }
     }
 }

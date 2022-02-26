@@ -1,4 +1,5 @@
 {
     "token": "<your_bot_token>",
-    "scenarioFile": "./scenarios/mainScenario.yml"
+    "scenarioFile": "./scenarios/mainScenario.yml",
+    "actionsFile": "./actions"
 }

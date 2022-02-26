@@ -6,16 +6,18 @@
  * 
  */
 
-import { IInlineKeyboardMarkup } from "../modules/scenarioTypes"
-import Storage from "../modules/Storage" 
+import { IInlineKeyboardMarkup } from "./scenarioTypes"
+import Storage from "./Storage" 
 
 const categories_per_rows = 3
 
 export default {
     sendCategories: (bot, msg) => {
+        let categories = Storage.getCategories()
+
         let rows = []
-        for(let i = 0; i < Math.ceil(Storage.categories.length/categories_per_rows); i++){
-            rows[i] = Storage.categories.slice( i*categories_per_rows, (i+1)*categories_per_rows)
+        for(let i = 0; i < Math.ceil(categories.length/categories_per_rows); i++){
+            rows[i] = categories.slice( i*categories_per_rows, (i+1)*categories_per_rows)
         }
         
         let options = {
@@ -31,7 +33,8 @@ export default {
                 buttonsRow.push({
                     text: button.name,
                     callback_data: JSON.stringify({
-                        category_id: button.id
+                        action: 'getProductsFromCategory',
+                        categoryId: button.id
                     })
                 })
             })

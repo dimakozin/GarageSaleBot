@@ -112,4 +112,4 @@ class ScenarioParser {
 
 }
 
-export {ScenarioParser}
+export default ScenarioParser

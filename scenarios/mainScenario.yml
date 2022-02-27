@@ -47,4 +47,23 @@ states:
                   - button:
                       text: "/help"
         drop_state: True
+    
+    callbacks:
+      getProdFromCategory:
+        postActions:
+          - "getProdFromCategory"
+      
+      sendFirstFromCategory:
+        postActions:
+          - "sendFirstFromCategory"
+      
+      addCategory:
+        middlewares:
+          - "IsUserAdmin"
+        text:
+          - "Введите название новой категории:"
+        setStateName: addCategory
+
+
+  
   

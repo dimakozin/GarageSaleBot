@@ -46,7 +46,9 @@ export default {
         if(UsersPrivileges.admins.includes(msg.from.username)){
             options.reply_markup.inline_keyboard.push([{
                 text: 'Добавить категорию',
-                callback_data: 'addCategory'
+                callback_data: JSON.stringify({
+                    action: 'addCategory'
+                })
             }])
         }
 
@@ -185,6 +187,6 @@ export default {
             })
     },
     addCategory: (bot, msg, callback_data = null) => {
-        
+        console.log('here')
     }
 }

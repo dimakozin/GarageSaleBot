@@ -9,6 +9,11 @@
  * 
  */
 
-export default {
+import UsersPrivileges from "../modules/UsersPrivileges"
 
+export default {
+    IsUserAdmin: (bot:any, msg: any) => {
+        const username = msg.from.username // TODO: rewrite. Tis only for callbacks
+        return UsersPrivileges.admins.includes(username)
+    }
 }

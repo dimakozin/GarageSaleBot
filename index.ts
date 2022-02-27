@@ -21,7 +21,7 @@ const getMsgParameters = (msg: any, actionType: string) => {
             }
         case 'callback_query':
             return {
-                chatId: msg.message.chat.chatId,
+                chatId: msg.message.chat.id,
                 text: JSON.parse(msg.data).action
             }
         }

@@ -62,8 +62,25 @@ states:
           - "IsUserAdmin"
         text:
           - "Введите название новой категории:"
+          - "Если нажали на кнопку по ошибке, введите /exit"
         setStateName: addCategory
 
+  addCategory:
+    endpoints:
+      /exit:
+        text: 
+          - "Вернулись в главное меню"
+        reply_markup:
+          ReplyKeyboardMarkup:
+            keyboard:
+              - row:
+                - button:
+                    text: "/help"
+                - button: 
+                    text: "/getCatalog"
+
+      default:
+        #TODO: action for adding category
 
   
   

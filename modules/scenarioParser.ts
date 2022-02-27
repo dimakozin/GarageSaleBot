@@ -24,6 +24,10 @@ class ScenarioParser {
         return this.scenario.states[state].endpoints
     }
 
+    private getCallbacksByStates(state: string): Array<IBranch> {
+        return this.scenario.states[state].callbacks
+    }
+
     private getEndpointByEndpointName(endpoints, endpoint) {
         if(endpoint in endpoints){
             return endpoints[endpoint]
@@ -89,15 +93,17 @@ class ScenarioParser {
         else return {}
     }
 
-    public getResponse(state: string, endpoint: string) {
-        const endpoints = this.getEndpointsByStates(state)
+    public getResponse(actionType: string, state: string, endpoint: string) {
+        const endpoints = actionType == "message" ?
+        this.getEndpointsByStates(state) : this.getCallbacksByStates(state);
+        
         const endpointData = this.getEndpointByEndpointName(endpoints, endpoint)
         
         const text = endpointData?.text ? endpointData.text.join('\n') : null
         const options = this.getOptions(endpointData)
 
         const stateParameters = {
-            dropState: endpointData.dropState,
+            dropState: 'dropState' in endpointData ? endpointData.dropState : null,
             setState: 'setState' in endpointData ? endpointData.setState : null,
             setStateName: 'setStateName' in endpointData ? endpointData.setStateName : null
         }

@@ -2,7 +2,6 @@ import TelegramBot from 'node-telegram-bot-api';
 
 import StateMachine from './modules/stateMachine'
 import ScenarioParser from './modules/scenarioParser'
-import ActionsParser from './modules/actionsParser'
 import * as settings from './settings.json' 
 
 import Actions from './modules/actions'
@@ -12,16 +11,28 @@ const token = settings.token;
 const bot = new TelegramBot(token, {polling: true});
 
 const scenarioParser = new ScenarioParser(settings.scenarioFile)
-const actionsParser = new ActionsParser(settings.actionsFile, bot)
 
-bot.on('message', (msg) => {
-    const chatId = msg.chat.id
-    const text = msg.text
+const getMsgParameters = (msg: any, actionType: string) => {
+    switch (actionType) {
+        case 'message':
+            return {
+                chatId: msg.chat.id,
+                text: msg.text    
+            }
+        case 'callback_query':
+            return {
+                chatId: msg.message.chat.chatId,
+                text: JSON.parse(msg.data).action
+            }
+        }
+}
 
+const doAction = (actionType: string, msg: any) => {
+    const {chatId, text} = getMsgParameters(msg, actionType)
     const userState = StateMachine.getState(chatId)
 
-    const response = scenarioParser.getResponse(userState, text)
-    
+    const response = scenarioParser.getResponse(actionType, userState, text)
+
     const middlewares = response.actions.middlewares
     let middlewaresPassed = true
     if(middlewares){
@@ -41,7 +52,13 @@ bot.on('message', (msg) => {
         if(postActions){
             postActions.forEach( action => {
                 if(action in Actions){
-                    Actions[action](bot, msg);
+                    if(actionType == 'message'){
+                        Actions[action](bot, msg);
+                    }
+                    else {
+                        const data = JSON.parse(msg.data)
+                        Actions[action](bot, msg, data)
+                    }   
                 }   
             })
         }
@@ -51,13 +68,15 @@ bot.on('message', (msg) => {
 
     if(response.stateParameters.dropState){
         StateMachine.dropState(chatId)
-    } else if(response.stateParameters.setState){
+    } else if(response.stateParameters.setStateName){
         StateMachine.setState(chatId, response.stateParameters.setStateName)
     }
-})
+
+}
+
+
+bot.on('message', (msg: any) => doAction('message', msg))
+
+bot.on('callback_query', (msg: any) => doAction('callback_query', msg))
 
 bot.on("polling_error", console.log);
-
-bot.on('callback_query', msg => {
-    actionsParser.doAction(msg)
-})

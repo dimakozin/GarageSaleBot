@@ -9,6 +9,7 @@
 
 import { IInlineKeyboardMarkup } from "./scenarioTypes"
 import Storage from "./Storage" 
+import UsersPrivileges from "./UsersPrivileges"
 
 const categories_per_rows = 3
 
@@ -41,6 +42,13 @@ export default {
             })
             options.reply_markup.inline_keyboard.push(buttonsRow)
         })
+
+        if(UsersPrivileges.admins.includes(msg.from.username)){
+            options.reply_markup.inline_keyboard.push([{
+                text: 'Добавить категорию',
+                callback_data: 'addCategory'
+            }])
+        }
 
         bot.sendMessage(msg.chat.id, 'Выберите интересующую вас категорию:', options)
 
@@ -175,5 +183,8 @@ export default {
                     inline_keyboard: inline_keyboard
                 }
             })
+    },
+    addCategory: (bot, msg, callback_data = null) => {
+        
     }
 }

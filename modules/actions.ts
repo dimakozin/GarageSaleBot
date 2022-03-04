@@ -106,6 +106,14 @@ export default {
             })
         }
 
+        const addNewProduct = {
+            text: '➕ Добавить товар в категорию',
+            callback_data: JSON.stringify({
+                action: 'addProduct',
+                categoryId: categoryId
+            })
+        }
+
         if(seqNumber > 0){
             inline_keyboard[0].push(firstButton, prevButton)
         } 
@@ -114,6 +122,10 @@ export default {
 
         if(seqNumber < productInfo.categoryLength-1){
             inline_keyboard[0].push(nextButton, lastButton)
+        }
+
+        if(UsersPrivileges.admins.includes(msg.from.username)){
+            inline_keyboard.push([addNewProduct])
         }
 
         const description = `${product.name}. Стоимость: ${product.price}`

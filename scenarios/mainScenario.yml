@@ -80,7 +80,12 @@ states:
                     text: "/getCatalog"
 
       default:
-        #TODO: action for adding category
+        text:
+          - "Категория добавлена"
+          - "/getCatalog - просмотреть каталог"
+        postActions:
+          - "addCategory"
+        dropState: True
 
   
   

@@ -170,10 +170,22 @@ export default {
             })
         }
 
+        const addNewProduct = {
+            text: '➕ Добавить товар в категорию',
+            callback_data: JSON.stringify({
+                action: 'addProduct',
+                categoryId: categoryId
+            })
+        }
+
         inline_keyboard[0].push(likeButton)
 
         if(productInfo.categoryLength !== 1){
             inline_keyboard[0].push(nextButton, lastButton)
+        }
+
+        if(UsersPrivileges.admins.includes(msg.from.username)){
+            inline_keyboard.push([addNewProduct])
         }
 
         const description = `${product.name}. Стоимость: ${product.price}`
@@ -187,6 +199,7 @@ export default {
             })
     },
     addCategory: (bot, msg, callback_data = null) => {
-        console.log('here')
+        const categoryName = msg.text
+        Storage.addCategory(categoryName)
     }
 }

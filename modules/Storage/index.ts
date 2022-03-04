@@ -71,5 +71,11 @@ export default {
             product: categoryProducts[seqNumber],
             categoryLength: categoryProducts.length
         }
+    },
+    addCategory: (category: string) => {
+        categories.push({
+            id: categories.length,
+            name: category
+        })
     }
 }

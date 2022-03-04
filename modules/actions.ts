@@ -200,6 +200,10 @@ export default {
     },
     addCategory: (bot, msg, callback_data = null) => {
         const categoryName = msg.text
-        Storage.addCategory(categoryName)
+        try{
+            Storage.addCategory(categoryName)
+        } catch(ex) {
+            bot.sendMessage(msg.chat.id, 'Произошла ошибка при добавлении категории')
+        }
     }
 }

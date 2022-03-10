@@ -10,8 +10,37 @@
 import { IInlineKeyboardMarkup } from "./scenarioTypes"
 import Storage from "./Storage" 
 import UsersPrivileges from "./UsersPrivileges"
+import {ProductButton, FirstProductButton, LikeButton, AddProductButton} from './buttons'
 
 const categories_per_rows = 3
+
+const getProductsButtons = (categoryId, productId, seqNumber, categoryLength, username) => {
+    const inline_keyboard = [[]]
+
+    const firstButton = new FirstProductButton(categoryId)
+    const prevButton = new ProductButton('◀️', categoryId, seqNumber - 1)
+    const nextButton = new ProductButton('▶️', categoryId, seqNumber + 1)
+    const lastButton = new ProductButton('⏩', categoryId, categoryLength-1)
+    const addNewProduct = new AddProductButton(categoryId)
+
+    const likeButton = new LikeButton(productId)
+
+    if(seqNumber > 0){
+        inline_keyboard[0].push(firstButton.toObject(), prevButton.toObject())
+    } 
+
+    inline_keyboard[0].push(likeButton.toObject())
+
+    if(seqNumber < categoryLength-1){
+        inline_keyboard[0].push(nextButton.toObject(), lastButton.toObject())
+    }
+
+    if(UsersPrivileges.admins.includes(username)){
+        inline_keyboard.push([addNewProduct.toObject()])
+    }
+
+    return inline_keyboard
+}
 
 export default {
     sendCategories: (bot, msg, callback_data = null) => {
@@ -60,75 +89,10 @@ export default {
         const productInfo = Storage.getProdFromCategory(categoryId, seqNumber);
         const product = productInfo.product
 
-        let inline_keyboard = [[]]
-
-        const firstButton = {
-            text: '⏪',
-            callback_data: JSON.stringify({
-                action: 'getProdFromCategory',
-                categoryId: categoryId,
-                seqNumber: 0
-            })
-        }
-
-        const prevButton = {
-            text: '◀️',
-            callback_data: JSON.stringify({
-                action: 'getProdFromCategory',
-                categoryId: categoryId,
-                seqNumber: seqNumber-1
-            })
-        }
-
-        const nextButton = {
-            text: '▶️',
-            callback_data: JSON.stringify({
-                action: 'getProdFromCategory',
-                categoryId: categoryId,
-                seqNumber: seqNumber + 1
-            })
-        }
-
-        const lastButton = {
-            text: '⏩',
-            callback_data: JSON.stringify({
-                action: 'getProdFromCategory',
-                categoryId: categoryId,
-                seqNumber: productInfo.categoryLength-1
-            })
-        }
-
-        const likeButton = {
-            text: '❤️',
-            callback_data: JSON.stringify({
-                action: 'likeProduct',
-                product: product.id
-            })
-        }
-
-        const addNewProduct = {
-            text: '➕ Добавить товар в категорию',
-            callback_data: JSON.stringify({
-                action: 'addProduct',
-                categoryId: categoryId
-            })
-        }
-
-        if(seqNumber > 0){
-            inline_keyboard[0].push(firstButton, prevButton)
-        } 
-
-        inline_keyboard[0].push(likeButton)
-
-        if(seqNumber < productInfo.categoryLength-1){
-            inline_keyboard[0].push(nextButton, lastButton)
-        }
-
-        if(UsersPrivileges.admins.includes(msg.from.username)){
-            inline_keyboard.push([addNewProduct])
-        }
-
         const description = `${product.name}. Стоимость: ${product.price}`
+
+        const inline_keyboard = getProductsButtons(categoryId, product.id, 
+            seqNumber, productInfo.categoryLength, msg.from.username)
 
         bot.editMessageMedia({
             type: 'photo',
@@ -154,52 +118,9 @@ export default {
         const productInfo = Storage.getProdFromCategory(categoryId, 0);
         const product = productInfo.product
 
-        let inline_keyboard = [[]]
-
-        const nextButton = {
-            text: '▶️',
-            callback_data: JSON.stringify({
-                action: 'getProdFromCategory',
-                categoryId: categoryId,
-                seqNumber: 1
-            })
-        }
-
-        const lastButton = {
-            text: '⏩',
-            callback_data: JSON.stringify({
-                action: 'getProdFromCategory',
-                categoryId: categoryId,
-                seqNumber: productInfo.categoryLength-1
-            })
-        }
-
-        const likeButton = {
-            text: '❤️',
-            callback_data: JSON.stringify({
-                action: 'likeProduct',
-                product: product.id
-            })
-        }
-
-        const addNewProduct = {
-            text: '➕ Добавить товар в категорию',
-            callback_data: JSON.stringify({
-                action: 'addProduct',
-                categoryId: categoryId
-            })
-        }
-
-        inline_keyboard[0].push(likeButton)
-
-        if(productInfo.categoryLength !== 1){
-            inline_keyboard[0].push(nextButton, lastButton)
-        }
-
-        if(UsersPrivileges.admins.includes(msg.from.username)){
-            inline_keyboard.push([addNewProduct])
-        }
-
+        const inline_keyboard = getProductsButtons(categoryId, product.id, 
+            0, productInfo.categoryLength, msg.from.username)
+        
         const description = `${product.name}. Стоимость: ${product.price}`
 
         bot.sendPhoto(msg.message.chat.id,

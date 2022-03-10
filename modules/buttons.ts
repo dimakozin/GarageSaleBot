@@ -70,7 +70,7 @@ class AddProductButton extends TelegramButton {
         return {
             text: this.text,
             callback_data: JSON.stringify({
-                action: this.text,
+                action: this.action,
                 product: this.categoryId
             })
         }

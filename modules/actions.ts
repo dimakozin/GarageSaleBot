@@ -17,7 +17,11 @@ import {ProductButton,
     CategoryButton,
     AddCategoryButton } from './buttons'
 
+import {BPM, BPMState} from './BPM'
+
+const BPMEngine = new BPM()
 const categories_per_rows = 3
+
 
 const getProductsButtons = (categoryId, productId, seqNumber, categoryLength, username) => {
     const inline_keyboard = [[]]
@@ -133,5 +137,50 @@ export default {
         } catch(ex) {
             bot.sendMessage(msg.chat.id, 'Произошла ошибка при добавлении категории')
         }
+    },
+    startAddProductProcess: (bot, msg, callback_data = null) => {
+        const userId = msg.message.chat.id
+        BPMEngine.startProccess(userId)
+        BPMEngine.addParameterToUserState(userId, {
+            categoryId: callback_data.categoryId
+        })
+    },
+    addProduct: (bot, msg, callback_data = null) => {
+        const userId = msg.chat.id
+        let bpmUserState = BPMEngine.getUserState(userId)   
+             
+        switch(bpmUserState){
+            case BPMState.setProductName:
+                BPMEngine.addParameterToUserState(userId, {
+                    name: msg.text
+                })
+                BPMEngine.setNextState(userId)
+                bot.sendMessage(userId, 'Теперь пришлите фотографию продукта')
+                break;
+            case BPMState.setProductPhoto:
+                const photos = msg.photo
+                const bestQualityPhoto = photos[photos.length-1]
+                const fileId = bestQualityPhoto.file_id
+                BPMEngine.addParameterToUserState(userId, {
+                    file_id: fileId
+                })
+                BPMEngine.setNextState(userId)
+                bot.sendMessage(userId, 'И цену:')
+                break;
+            case BPMState.setProductPrice:
+                BPMEngine.addParameterToUserState(userId, {
+                    price: msg.text
+                })
+                const data = BPMEngine.getStateData(userId)
+                Storage.addNewProduct(data)
+                BPMEngine.setNextState(userId)
+                bot.sendMessage(userId, 'Продукт добавлен!\
+                \nЕсли хотите добавить еще продукт - просто введите наименование\
+                \nЕсли хотите выйти из режима добавления - введите /stop')
+                break;
+        }
+    },
+    dropBPMUserState: (bot, msg, callback_data = null) => {
+        BPMEngine.dropState(msg.chat.id)
     }
 }

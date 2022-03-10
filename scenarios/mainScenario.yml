@@ -69,9 +69,12 @@ states:
         middlewares:
           - "IsUserAdmin"
         text:
-          - "Введите название нового продукта:"
+          - "Переходим к публикации нового продукта"
+          - "Введите наименование продукта:"
           - "Если нажали на кнопку по ошибке, введите /exit"
-        setStateName: addProduct_FirstStep
+        postActions:
+          - "startAddProductProcess"
+        setStateName: addProduct
 
   addCategory:
     endpoints:
@@ -97,7 +100,7 @@ states:
         dropState: True
 
   
-  addProduct_FirstStep:
+  addProduct:
     endpoints:
         /exit:
           text: 
@@ -112,7 +115,14 @@ states:
                   - button: 
                       text: "/getCatalog"
 
-        default:
+        /stop:
           text:
-            - "TODO: переход по шагам с сохранением контекста"
+            - "Вышли из режима добавления продуктов"
+            - "/getCatalog - перейти к каталогу"
           dropState: True
+          postActions:
+            - "dropBPMUserState"
+
+        default:
+          postActions:
+            - "addProduct"

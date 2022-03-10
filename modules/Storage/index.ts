@@ -77,5 +77,8 @@ export default {
             id: categories.length,
             name: category
         })
+    },
+    addNewProduct: (productData) => {
+        products.push(productData)
     }
 }

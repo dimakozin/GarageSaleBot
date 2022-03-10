@@ -59,7 +59,7 @@ const products = [
 
 export default {
     getCategories: () => {
-        return categories
+        return categories ?? []
     },
     getProdFromCategory: (categoryId: number, seqNumber: number) => {
         const categoryProducts = products.filter(product => product.categoryId === categoryId)

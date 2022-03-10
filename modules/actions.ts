@@ -24,24 +24,30 @@ const categories_per_rows = 3
 
 
 const getProductsButtons = (categoryId, productId, seqNumber, categoryLength, username) => {
-    const inline_keyboard = [[]]
+    const inline_keyboard = []
 
-    const firstButton = new FirstProductButton(categoryId)
-    const prevButton = new ProductButton('◀️', categoryId, seqNumber - 1)
-    const nextButton = new ProductButton('▶️', categoryId, seqNumber + 1)
-    const lastButton = new ProductButton('⏩', categoryId, categoryLength-1)
     const addNewProduct = new AddProductButton(categoryId)
 
-    const likeButton = new LikeButton(productId)
+    if(categoryLength != 0)
+    {
+        inline_keyboard.push([])
 
-    if(seqNumber > 0){
-        inline_keyboard[0].push(firstButton.toObject(), prevButton.toObject())
-    } 
-
-    inline_keyboard[0].push(likeButton.toObject())
-
-    if(seqNumber < categoryLength-1){
-        inline_keyboard[0].push(nextButton.toObject(), lastButton.toObject())
+        const firstButton = new FirstProductButton(categoryId)
+        const prevButton = new ProductButton('◀️', categoryId, seqNumber - 1)
+        const nextButton = new ProductButton('▶️', categoryId, seqNumber + 1)
+        const lastButton = new ProductButton('⏩', categoryId, categoryLength-1)
+    
+        const likeButton = new LikeButton(productId)
+    
+        if(seqNumber > 0){
+            inline_keyboard[0].push(firstButton.toObject(), prevButton.toObject())
+        } 
+    
+        inline_keyboard[0].push(likeButton.toObject())
+    
+        if(seqNumber < categoryLength-1){
+            inline_keyboard[0].push(nextButton.toObject(), lastButton.toObject())
+        } 
     }
 
     if(UsersPrivileges.admins.includes(username)){
@@ -114,15 +120,24 @@ export default {
     },
     sendFirstFromCategory: (bot, msg, callback_data = null) => {
         const {categoryId} = callback_data
+        const userId = msg.message.chat.id
         const productInfo = Storage.getProdFromCategory(categoryId, 0);
         const product = productInfo.product
 
-        const inline_keyboard = getProductsButtons(categoryId, product.id, 
+        const inline_keyboard = getProductsButtons(categoryId, product ? product.id : 0, 
             0, productInfo.categoryLength, msg.from.username)
         
+        if(productInfo.categoryLength == 0){
+            bot.sendMessage(userId, 'Категория пуста', {
+                reply_markup: {
+                    inline_keyboard: inline_keyboard
+                }
+            })
+        }
+
         const description = `${product.name}. Стоимость: ${product.price}`
 
-        bot.sendPhoto(msg.message.chat.id,
+        bot.sendPhoto(userId,
             product.file_id, {
                 caption: description,
                 reply_markup: {

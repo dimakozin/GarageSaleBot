@@ -133,6 +133,7 @@ export default {
                     inline_keyboard: inline_keyboard
                 }
             })
+            return
         }
 
         const description = `${product.name}. Стоимость: ${product.price}`

@@ -10,7 +10,12 @@
 import { IInlineKeyboardMarkup } from "./scenarioTypes"
 import Storage from "./Storage" 
 import UsersPrivileges from "./UsersPrivileges"
-import {ProductButton, FirstProductButton, LikeButton, AddProductButton} from './buttons'
+import {ProductButton, 
+    FirstProductButton, 
+    LikeButton, 
+    AddProductButton,
+    CategoryButton,
+    AddCategoryButton } from './buttons'
 
 const categories_per_rows = 3
 
@@ -61,24 +66,14 @@ export default {
         rows.forEach( row => {
             let buttonsRow = []
             row.forEach(button => {
-                buttonsRow.push({
-                    text: button.name,
-                    callback_data: JSON.stringify({
-                        action: 'sendFirstFromCategory',
-                        categoryId: button.id,
-                    })
-                })
+                const categoryButton = new CategoryButton(button.name, button.id)
+                buttonsRow.push(categoryButton.toObject())
             })
             options.reply_markup.inline_keyboard.push(buttonsRow)
         })
 
         if(UsersPrivileges.admins.includes(msg.from.username)){
-            options.reply_markup.inline_keyboard.push([{
-                text: 'Добавить категорию',
-                callback_data: JSON.stringify({
-                    action: 'addCategory'
-                })
-            }])
+            options.reply_markup.inline_keyboard.push([new AddCategoryButton().toObject()])
         }
 
         bot.sendMessage(msg.chat.id, 'Выберите интересующую вас категорию:', options)

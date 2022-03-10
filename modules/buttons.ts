@@ -1,4 +1,9 @@
 
+interface ITelegramButtonObject {
+    text: string,
+    callback_data: string
+}
+
 abstract class TelegramButton {
     protected text: string
     protected readonly action: string
@@ -8,7 +13,7 @@ abstract class TelegramButton {
         this.action = action
     }
 
-    public toObject(): object { return {} }
+    public toObject(): ITelegramButtonObject { throw new Error('Method cannot implemented in abstract class'); }
 }
 
 class ProductButton extends TelegramButton {
@@ -21,7 +26,7 @@ class ProductButton extends TelegramButton {
         this.seqNumber = seqNumber
     }
 
-    public toObject(): object {
+    public toObject(): ITelegramButtonObject {
         return {
             text: this.text,
             callback_data: JSON.stringify({
@@ -33,6 +38,24 @@ class ProductButton extends TelegramButton {
     }    
 }
 
+class CategoryButton extends TelegramButton {
+    protected categoryId: string
+    
+    constructor(text: string, categoryId: string){
+        super(text, 'sendFirstFromCategory')
+        this.categoryId = categoryId
+    }
+
+    public toObject(): ITelegramButtonObject {
+        return {
+            text: this.text,
+            callback_data: JSON.stringify({
+                action: this.action,
+               categoryId: this.categoryId,
+            })
+        }
+    }
+}
 class FirstProductButton extends ProductButton {
     constructor(categoryId: string){
         super('⏪', categoryId, 0)
@@ -47,7 +70,7 @@ class LikeButton extends TelegramButton {
         this.productId = productId
     }
 
-    public toObject(): object {
+    public toObject(): ITelegramButtonObject {
         return {
             text: this.text,
             callback_data: JSON.stringify({
@@ -66,7 +89,7 @@ class AddProductButton extends TelegramButton {
         this.categoryId = categoryId
     }
 
-    public toObject(): object {
+    public toObject(): ITelegramButtonObject {
         return {
             text: this.text,
             callback_data: JSON.stringify({
@@ -77,4 +100,19 @@ class AddProductButton extends TelegramButton {
     }
 }
 
-export {ProductButton, FirstProductButton, LikeButton, AddProductButton}
+class AddCategoryButton extends TelegramButton {
+    constructor() {
+        super('➕ Добавить категорию', 'addCategory')
+    }
+
+    public toObject(): ITelegramButtonObject {
+        return {
+            text: this.text,
+            callback_data: JSON.stringify({
+                action: this.action
+            })
+        }
+    }
+}
+
+export {ProductButton, FirstProductButton, LikeButton, AddProductButton, CategoryButton, AddCategoryButton}

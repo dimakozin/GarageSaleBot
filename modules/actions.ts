@@ -10,8 +10,42 @@
 import { IInlineKeyboardMarkup } from "./scenarioTypes"
 import Storage from "./Storage" 
 import UsersPrivileges from "./UsersPrivileges"
+import {ProductButton, 
+    FirstProductButton, 
+    LikeButton, 
+    AddProductButton,
+    CategoryButton,
+    AddCategoryButton } from './buttons'
 
 const categories_per_rows = 3
+
+const getProductsButtons = (categoryId, productId, seqNumber, categoryLength, username) => {
+    const inline_keyboard = [[]]
+
+    const firstButton = new FirstProductButton(categoryId)
+    const prevButton = new ProductButton('◀️', categoryId, seqNumber - 1)
+    const nextButton = new ProductButton('▶️', categoryId, seqNumber + 1)
+    const lastButton = new ProductButton('⏩', categoryId, categoryLength-1)
+    const addNewProduct = new AddProductButton(categoryId)
+
+    const likeButton = new LikeButton(productId)
+
+    if(seqNumber > 0){
+        inline_keyboard[0].push(firstButton.toObject(), prevButton.toObject())
+    } 
+
+    inline_keyboard[0].push(likeButton.toObject())
+
+    if(seqNumber < categoryLength-1){
+        inline_keyboard[0].push(nextButton.toObject(), lastButton.toObject())
+    }
+
+    if(UsersPrivileges.admins.includes(username)){
+        inline_keyboard.push([addNewProduct.toObject()])
+    }
+
+    return inline_keyboard
+}
 
 export default {
     sendCategories: (bot, msg, callback_data = null) => {
@@ -32,24 +66,14 @@ export default {
         rows.forEach( row => {
             let buttonsRow = []
             row.forEach(button => {
-                buttonsRow.push({
-                    text: button.name,
-                    callback_data: JSON.stringify({
-                        action: 'sendFirstFromCategory',
-                        categoryId: button.id,
-                    })
-                })
+                const categoryButton = new CategoryButton(button.name, button.id)
+                buttonsRow.push(categoryButton.toObject())
             })
             options.reply_markup.inline_keyboard.push(buttonsRow)
         })
 
         if(UsersPrivileges.admins.includes(msg.from.username)){
-            options.reply_markup.inline_keyboard.push([{
-                text: 'Добавить категорию',
-                callback_data: JSON.stringify({
-                    action: 'addCategory'
-                })
-            }])
+            options.reply_markup.inline_keyboard.push([new AddCategoryButton().toObject()])
         }
 
         bot.sendMessage(msg.chat.id, 'Выберите интересующую вас категорию:', options)
@@ -60,63 +84,10 @@ export default {
         const productInfo = Storage.getProdFromCategory(categoryId, seqNumber);
         const product = productInfo.product
 
-        let inline_keyboard = [[]]
-
-        const firstButton = {
-            text: '⏪',
-            callback_data: JSON.stringify({
-                action: 'getProdFromCategory',
-                categoryId: categoryId,
-                seqNumber: 0
-            })
-        }
-
-        const prevButton = {
-            text: '◀️',
-            callback_data: JSON.stringify({
-                action: 'getProdFromCategory',
-                categoryId: categoryId,
-                seqNumber: seqNumber-1
-            })
-        }
-
-        const nextButton = {
-            text: '▶️',
-            callback_data: JSON.stringify({
-                action: 'getProdFromCategory',
-                categoryId: categoryId,
-                seqNumber: seqNumber + 1
-            })
-        }
-
-        const lastButton = {
-            text: '⏩',
-            callback_data: JSON.stringify({
-                action: 'getProdFromCategory',
-                categoryId: categoryId,
-                seqNumber: productInfo.categoryLength-1
-            })
-        }
-
-        const likeButton = {
-            text: '❤️',
-            callback_data: JSON.stringify({
-                action: 'likeProduct',
-                product: product.id
-            })
-        }
-
-        if(seqNumber > 0){
-            inline_keyboard[0].push(firstButton, prevButton)
-        } 
-
-        inline_keyboard[0].push(likeButton)
-
-        if(seqNumber < productInfo.categoryLength-1){
-            inline_keyboard[0].push(nextButton, lastButton)
-        }
-
         const description = `${product.name}. Стоимость: ${product.price}`
+
+        const inline_keyboard = getProductsButtons(categoryId, product.id, 
+            seqNumber, productInfo.categoryLength, msg.from.username)
 
         bot.editMessageMedia({
             type: 'photo',
@@ -142,40 +113,9 @@ export default {
         const productInfo = Storage.getProdFromCategory(categoryId, 0);
         const product = productInfo.product
 
-        let inline_keyboard = [[]]
-
-        const nextButton = {
-            text: '▶️',
-            callback_data: JSON.stringify({
-                action: 'getProdFromCategory',
-                categoryId: categoryId,
-                seqNumber: 1
-            })
-        }
-
-        const lastButton = {
-            text: '⏩',
-            callback_data: JSON.stringify({
-                action: 'getProdFromCategory',
-                categoryId: categoryId,
-                seqNumber: productInfo.categoryLength-1
-            })
-        }
-
-        const likeButton = {
-            text: '❤️',
-            callback_data: JSON.stringify({
-                action: 'likeProduct',
-                product: product.id
-            })
-        }
-
-        inline_keyboard[0].push(likeButton)
-
-        if(productInfo.categoryLength !== 1){
-            inline_keyboard[0].push(nextButton, lastButton)
-        }
-
+        const inline_keyboard = getProductsButtons(categoryId, product.id, 
+            0, productInfo.categoryLength, msg.from.username)
+        
         const description = `${product.name}. Стоимость: ${product.price}`
 
         bot.sendPhoto(msg.message.chat.id,
@@ -187,6 +127,11 @@ export default {
             })
     },
     addCategory: (bot, msg, callback_data = null) => {
-        console.log('here')
+        const categoryName = msg.text
+        try{
+            Storage.addCategory(categoryName)
+        } catch(ex) {
+            bot.sendMessage(msg.chat.id, 'Произошла ошибка при добавлении категории')
+        }
     }
 }

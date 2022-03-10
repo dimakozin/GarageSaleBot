@@ -65,11 +65,20 @@ states:
           - "Если нажали на кнопку по ошибке, введите /exit"
         setStateName: addCategory
 
+      addProduct:
+        middlewares:
+          - "IsUserAdmin"
+        text:
+          - "Введите название нового продукта:"
+          - "Если нажали на кнопку по ошибке, введите /exit"
+        setStateName: addProduct_FirstStep
+
   addCategory:
     endpoints:
       /exit:
         text: 
           - "Вернулись в главное меню"
+        dropState: True
         reply_markup:
           ReplyKeyboardMarkup:
             keyboard:
@@ -80,7 +89,30 @@ states:
                     text: "/getCatalog"
 
       default:
-        #TODO: action for adding category
+        text:
+          - "Категория добавлена"
+          - "/getCatalog - просмотреть каталог"
+        postActions:
+          - "addCategory"
+        dropState: True
 
   
-  
+  addProduct_FirstStep:
+    endpoints:
+        /exit:
+          text: 
+            - "Вернулись в главное меню"
+          dropState: True
+          reply_markup:
+            ReplyKeyboardMarkup:
+              keyboard:
+                - row:
+                  - button:
+                      text: "/help"
+                  - button: 
+                      text: "/getCatalog"
+
+        default:
+          text:
+            - "TODO: переход по шагам с сохранением контекста"
+          dropState: True

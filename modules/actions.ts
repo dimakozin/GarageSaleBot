@@ -205,7 +205,9 @@ export default {
 
         const productLiked = Storage.isLikeSetted(username, product)
 
-        if(!productLiked){
+        if(productLiked){
+           Storage.unsetLike(username, product)
+        } else {
             Storage.setLike(username, product)
         }
 

@@ -1,3 +1,4 @@
+import { type } from "os"
 
 const categories = [
     {
@@ -111,6 +112,15 @@ export default {
                 username: username,
                 likedProducts: [productId]
             })
+        }
+    }, 
+    unsetLike: (username: string, productId: number) => {
+        const userLikes = likedProducts.find( (obj) => {
+            return obj.username == username
+        })
+
+        if(!!userLikes){
+            userLikes.likedProducts = userLikes.likedProducts.filter( el => el !== productId )
         }
     }
 }

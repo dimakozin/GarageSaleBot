@@ -57,6 +57,13 @@ const products = [
     }
 ]
 
+interface userLikedProducts {
+    username: string,
+    likedProducts: Array<number>
+}
+
+const likedProducts = [] as Array<userLikedProducts>
+
 export default {
     getCategories: () => {
         return categories ?? []
@@ -80,5 +87,30 @@ export default {
     },
     addNewProduct: (productData) => {
         products.push(productData)
+    },
+    isLikeSetted: (username: string, productId: number) => {
+        const userLikes = likedProducts.find( (obj) => {
+            return obj.username == username
+        })
+
+        if(!!userLikes){
+            return userLikes.likedProducts.includes(productId)
+        }
+
+        return false
+    },
+    setLike: (username: string, productId: number) => {
+        const userLikes = likedProducts.find( (obj) => {
+            return obj.username == username
+        })
+
+        if(!!userLikes){
+            userLikes.likedProducts.push(productId)
+        } else {
+            likedProducts.push({
+                username: username,
+                likedProducts: [productId]
+            })
+        }
     }
 }

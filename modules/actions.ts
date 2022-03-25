@@ -198,5 +198,16 @@ export default {
     },
     dropBPMUserState: (bot, msg, callback_data = null) => {
         BPMEngine.dropState(msg.chat.id)
+    },
+    likeProduct: (bot, msg, callback_data = null) => {
+        const username = msg.from.username
+        const {product} = callback_data
+
+        const productLiked = Storage.isLikeSetted(username, product)
+
+        if(!productLiked){
+            Storage.setLike(username, product)
+        }
+
     }
 }

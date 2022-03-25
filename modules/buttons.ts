@@ -81,6 +81,25 @@ class LikeButton extends TelegramButton {
     }
 }
 
+class DislikeButton extends TelegramButton {
+    private productId: number
+
+    constructor(productId: number){
+        super('💔', 'likeProduct')
+        this.productId = productId
+    }
+
+    public toObject(): ITelegramButtonObject {
+        return {
+            text: this.text,
+            callback_data: JSON.stringify({
+                action: this.action,
+                product: this.productId
+            })
+        }
+    }
+}
+
 class AddProductButton extends TelegramButton {
     protected readonly categoryId: string
 
@@ -115,4 +134,4 @@ class AddCategoryButton extends TelegramButton {
     }
 }
 
-export {ProductButton, FirstProductButton, LikeButton, AddProductButton, CategoryButton, AddCategoryButton}
+export {ProductButton, FirstProductButton, LikeButton, DislikeButton, AddProductButton, CategoryButton, AddCategoryButton}

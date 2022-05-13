@@ -12,7 +12,8 @@ import Storage from "./Storage"
 import UsersPrivileges from "./UsersPrivileges"
 import {ProductButton, 
     FirstProductButton, 
-    LikeButton, 
+    LikeButton,
+    DislikeButton, 
     AddProductButton,
     CategoryButton,
     AddCategoryButton } from './buttons'
@@ -37,7 +38,8 @@ const getProductsButtons = (categoryId, productId, seqNumber, categoryLength, us
         const nextButton = new ProductButton('▶️', categoryId, seqNumber + 1)
         const lastButton = new ProductButton('⏩', categoryId, categoryLength-1)
     
-        const likeButton = new LikeButton(productId)
+        const likeButton = Storage.isLikeSetted(username, productId) ?
+            new DislikeButton(productId) : new LikeButton(productId)
     
         if(seqNumber > 0){
             inline_keyboard[0].push(firstButton.toObject(), prevButton.toObject())
@@ -198,5 +200,25 @@ export default {
     },
     dropBPMUserState: (bot, msg, callback_data = null) => {
         BPMEngine.dropState(msg.chat.id)
+    },
+    likeProduct: (bot, msg, callback_data = null) => {
+        const username = msg.from.username
+        const {productId} = callback_data
+
+        const productLiked = Storage.isLikeSetted(username, productId)
+
+        if(productLiked){
+           Storage.unsetLike(username, productId)
+        } else {
+            Storage.setLike(username, productId)
+        }
+
+        bot.answerCallbackQuery(msg.id, {
+            show_alert: false,
+            text: !productLiked ? 'Добавлено в понравившиеся ❤️' :  'Удалено из понравившихся 💔'
+        })
+
+        // TODO: something strange with buttons changing...
+
     }
 }

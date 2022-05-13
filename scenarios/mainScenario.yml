@@ -76,6 +76,11 @@ states:
           - "startAddProductProcess"
         setStateName: addProduct
 
+      likeProduct:
+        middlewares:
+          - "IsUserAdmin"
+        postActions:
+          - "likeProduct"
   addCategory:
     endpoints:
       /exit:

@@ -122,5 +122,8 @@ export default {
         if(!!userLikes){
             userLikes.likedProducts = userLikes.likedProducts.filter( el => el !== productId )
         }
+    },
+    getProductById: (productId: number) => {
+        return products.find( item => item.id === productId)
     }
 }

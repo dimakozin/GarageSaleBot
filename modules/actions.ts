@@ -203,15 +203,22 @@ export default {
     },
     likeProduct: (bot, msg, callback_data = null) => {
         const username = msg.from.username
-        const {product} = callback_data
+        const {productId} = callback_data
 
-        const productLiked = Storage.isLikeSetted(username, product)
+        const productLiked = Storage.isLikeSetted(username, productId)
 
         if(productLiked){
-           Storage.unsetLike(username, product)
+           Storage.unsetLike(username, productId)
         } else {
-            Storage.setLike(username, product)
+            Storage.setLike(username, productId)
         }
+
+        bot.answerCallbackQuery(msg.id, {
+            show_alert: false,
+            text: !productLiked ? 'Добавлено в понравившиеся ❤️' :  'Удалено из понравившихся 💔'
+        })
+
+        // TODO: something strange with buttons changing...
 
     }
 }

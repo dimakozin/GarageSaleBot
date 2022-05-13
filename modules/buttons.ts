@@ -75,7 +75,7 @@ class LikeButton extends TelegramButton {
             text: this.text,
             callback_data: JSON.stringify({
                 action: this.action,
-                product: this.productId
+                productId: this.productId
             })
         }
     }
@@ -94,7 +94,7 @@ class DislikeButton extends TelegramButton {
             text: this.text,
             callback_data: JSON.stringify({
                 action: this.action,
-                product: this.productId
+                productId: this.productId
             })
         }
     }
